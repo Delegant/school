@@ -1,6 +1,7 @@
 package ru.hogwarts.school.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.service.FacultyService;
@@ -17,29 +18,36 @@ public class FacultyController {
         this.facultyService = facultyService;
     }
 
-
     @PostMapping()
-    public Faculty crateFaculty(@RequestBody Faculty faculty){
+    public Faculty crateFaculty(@RequestBody Faculty faculty) {
         return facultyService.crateFaculty(faculty);
     }
 
     @GetMapping("{id}")
-    public Faculty getFaculty(@PathVariable long id){
-       return facultyService.findFaculty(id);
+    public ResponseEntity<Faculty> findFaculty(@PathVariable long id) {
+        Faculty faculty = facultyService.findFaculty(id);
+        if (faculty == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(faculty);
     }
 
     @PutMapping()
-    public Faculty updateFaculty(@RequestBody Faculty faculty){
-       return facultyService.updateFaculty(faculty);
+    public ResponseEntity<Faculty> updateFaculty(@RequestBody Faculty faculty) {
+        Faculty foundFaculty =  facultyService.updateFaculty(faculty);
+        if (foundFaculty == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(foundFaculty);
     }
 
     @DeleteMapping("{id}")
-    public Faculty deleteFaculty(@PathVariable long id){
+    public Faculty deleteFaculty(@PathVariable long id) {
         return facultyService.deleteFaculty(id);
     }
 
-    @GetMapping("{color}")
-    public Collection<Faculty> filterColorFacultyCollection(@PathVariable String color){
+    @GetMapping("filter/{color}")
+    public Collection<Faculty> filterColorFacultyCollection(@PathVariable String color) {
         return facultyService.filterColorFacultyCollection(color);
     }
 

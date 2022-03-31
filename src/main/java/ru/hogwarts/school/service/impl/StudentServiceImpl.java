@@ -18,7 +18,8 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public Student crateStudent(Student student) {
         student.setId(++id);
-        return studentMap.put(student.getId(), student);
+        studentMap.put(id, student);
+        return student;
     }
 
     @Override

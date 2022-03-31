@@ -1,8 +1,7 @@
 package ru.hogwarts.school.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
@@ -18,29 +17,36 @@ public class StudentController {
         this.studentService = studentService;
     }
 
-    @PutMapping()
+    @PostMapping()
     public Student crateStudent(@RequestBody Student student) {
         return studentService.crateStudent(student);
     }
 
     @GetMapping("{id}")
-    public Student findStudent(@PathVariable long id) {
-        return studentService.findStudent(id);
+    public ResponseEntity<Student> findStudent(@PathVariable long id) {
+        Student student = studentService.findStudent(id);
+        if (student == null) {
+          return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(student);
     }
 
-    @PutMapping("{id}")
-    public Student updateStudent(@RequestBody Student student){
-        return studentService.updateStudent(student);
+    @PutMapping()
+    public ResponseEntity<Student> updateStudent(@RequestBody Student student) {
+        Student foundStudent = studentService.updateStudent(student);
+        if (student == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(foundStudent);
     }
 
     @DeleteMapping("{id}")
-    public Student deleteStudent(@PathVariable long id){
+    public Student deleteStudent(@PathVariable long id) {
         return studentService.deleteStudent(id);
     }
 
-    @GetMapping("{age}")
-    public Collection<Student> filterAgeStudentCollection(@PathVariable int age){
+    @GetMapping("filter/{age}")
+    public Collection<Student> filterAgeStudentCollection(@PathVariable int age) {
         return studentService.filterAgeStudentCollection(age);
     }
-
 }
