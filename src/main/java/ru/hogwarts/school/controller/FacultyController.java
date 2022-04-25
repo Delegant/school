@@ -3,7 +3,9 @@ package ru.hogwarts.school.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.Collection;
@@ -19,37 +21,50 @@ public class FacultyController {
     }
 
     @PostMapping()
-    public Faculty crateFaculty(@RequestBody Faculty faculty) {
-        return facultyService.crateFaculty(faculty);
+    public ResponseEntity<Faculty> crateFaculty(@RequestBody Faculty faculty) {
+        if (faculty.getId() != 0){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id must be empty");
+        }
+        Faculty cratedFaculty = facultyService.crateFaculty(faculty);
+        return ResponseEntity.status(HttpStatus.CREATED).body(cratedFaculty);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Faculty> findFaculty(@PathVariable long id) {
-        Faculty faculty = facultyService.findFaculty(id);
-        if (faculty == null) {
-            return ResponseEntity.notFound().build();
+    public Faculty findFaculty(@PathVariable long id) {
+        Faculty foundFaculty = facultyService.findFaculty(id);
+        if (foundFaculty == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Faculty doesn't exist.");
         }
-        return ResponseEntity.ok(faculty);
+        return foundFaculty;
     }
 
     @PutMapping()
-    public ResponseEntity<Faculty> updateFaculty(@RequestBody Faculty faculty) {
-        Faculty foundFaculty =  facultyService.updateFaculty(faculty);
+    public Faculty updateFaculty(@RequestBody Faculty faculty) {
+        Faculty foundFaculty = facultyService.findFaculty(faculty.getId());
         if (foundFaculty == null) {
-            return ResponseEntity.notFound().build();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Faculty doesn't exist.");
         }
-        return ResponseEntity.ok(foundFaculty);
+        return facultyService.updateFaculty(faculty);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Faculty> deleteFaculty(@PathVariable long id) {
+    public Faculty deleteFaculty(@PathVariable long id) {
+        Faculty foundFaculty = facultyService.findFaculty(id);
+        if (foundFaculty == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Faculty doesn't exist.");
+        }
         facultyService.deleteFaculty(id);
-        return ResponseEntity.ok().build();
+        return foundFaculty;
     }
 
-    @GetMapping("filter/{color}")
-    public Collection<Faculty> filterColorFacultyCollection(@PathVariable String color) {
-        return facultyService.filterColorFacultyCollection(color);
+    @GetMapping("filter/{name}")
+    public Collection<Faculty> filterNameFacultyCollection(@PathVariable String name) {
+        return facultyService.filterNameFacultyCollection(name);
+    }
+
+    @GetMapping("students/{id}")
+    public Collection<Student> getStudentsByFacultyId(@PathVariable long id) {
+        return facultyService.getStudentsByFacultyId(id);
     }
 
 }

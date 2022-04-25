@@ -1,7 +1,10 @@
 package ru.hogwarts.school.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
@@ -18,37 +21,54 @@ public class StudentController {
     }
 
     @PostMapping()
-    public Student crateStudent(@RequestBody Student student) {
-        return studentService.crateStudent(student);
+    public ResponseEntity<Student> crateStudent(@RequestBody Student student) {
+        if (student.getId() != 0){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id must be zero.");
+        }
+        Student createdStudent = studentService.crateStudent(student);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdStudent);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Student> findStudent(@PathVariable long id) {
-        Student student = studentService.findStudent(id);
-        if (student == null) {
-          return ResponseEntity.notFound().build();
+    public Student findStudent(@PathVariable long id) {
+        Student foundStudent = studentService.findStudent(id);
+        if (foundStudent == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student must be created.");
         }
-        return ResponseEntity.ok(student);
+            return studentService.findStudent(id);
     }
 
     @PutMapping()
-    public ResponseEntity<Student> updateStudent(@RequestBody Student student) {
-        Student foundStudent = studentService.updateStudent(student);
-        if (student == null) {
-            return ResponseEntity.notFound().build();
+    public Student updateStudent(@RequestBody Student student) {
+        Student foundStudent = studentService.findStudent(student.getId());
+        if (foundStudent == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student must be created.");
         }
-        return ResponseEntity.ok(foundStudent);
+        return studentService.updateStudent(student);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Student> deleteStudent(@PathVariable long id) {
+    public Student deleteStudent(@PathVariable long id) {
+        Student foundStudent = studentService.findStudent(id);
+        if (foundStudent == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student must be created.");
+        }
         studentService.deleteStudent(id);
-        return ResponseEntity.ok().build();
-
+        return foundStudent;
     }
 
     @GetMapping("filter/{age}")
     public Collection<Student> filterAgeStudentCollection(@PathVariable int age) {
         return studentService.filterAgeStudentCollection(age);
+    }
+
+    @GetMapping("filter/")
+    public Collection<Student> filterAgeBetween(@RequestParam(name = "min") int min, @RequestParam int max) {
+        return studentService.findByAgeBetween(min, max);
+    }
+
+    @GetMapping("faculty/{name}")
+    public Faculty getFacultyByStudentId(@PathVariable String name) {
+        return studentService.getFacultyByStudentId(name);
     }
 }
