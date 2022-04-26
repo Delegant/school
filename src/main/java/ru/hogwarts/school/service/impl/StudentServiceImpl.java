@@ -1,8 +1,13 @@
 package ru.hogwarts.school.service.impl;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
+import ru.hogwarts.school.service.FacultyService;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
@@ -11,9 +16,11 @@ import java.util.Collection;
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
+    private final FacultyRepository facultyRepository;
 
-    public StudentServiceImpl(StudentRepository studentRepository) {
+    public StudentServiceImpl(StudentRepository studentRepository, FacultyRepository facultyRepository) {
         this.studentRepository = studentRepository;
+        this.facultyRepository = facultyRepository;
     }
 
     @Override
@@ -23,7 +30,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student findStudent(long id) {
-        return studentRepository.findById(id).get();
+        return studentRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -39,6 +46,16 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public Collection<Student> filterAgeStudentCollection(int age) {
         return studentRepository.findByAge(age);
+    }
+
+    @Override
+    public  Collection<Student> findByAgeBetween (int min, int max) {
+        return studentRepository.findByAgeBetween(min, max);
+    }
+
+    @Override
+    public Faculty getFacultyByStudentId(String name){
+        return facultyRepository.getFacultyByStudentId(name);
     }
 
 }

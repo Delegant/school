@@ -2,21 +2,23 @@ package ru.hogwarts.school.service.impl;
 
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
+import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.FacultyService;
+import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class FacultyServiceImpl implements FacultyService {
 
     private final FacultyRepository facultyRepository;
+    private final StudentRepository studentRepository;
 
-    public FacultyServiceImpl(FacultyRepository facultyRepository) {
+    public FacultyServiceImpl(FacultyRepository facultyRepository, StudentRepository studentRepository) {
         this.facultyRepository = facultyRepository;
+        this.studentRepository = studentRepository;
     }
 
 
@@ -27,7 +29,7 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public Faculty findFaculty(long id) {
-        return facultyRepository.findById(id).get();
+        return facultyRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -41,7 +43,12 @@ public class FacultyServiceImpl implements FacultyService {
     }
 
     @Override
-    public Collection<Faculty> filterColorFacultyCollection(String color) {
-        return facultyRepository.findByColorLike(color);
+    public Collection<Faculty> filterNameFacultyCollection(String name) {
+        return facultyRepository.findByNameIgnoreCase(name);
+    }
+
+    @Override
+    public Collection<Student> getStudentsByFacultyId(long id) {
+        return studentRepository.getStudentsByFacultyId(id);
     }
 }
