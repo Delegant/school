@@ -13,7 +13,7 @@ public class Avatar {
     private long fileSize;
     private String mediaType;
     @Lob
-    private byte[] data;
+    private byte[] preview;
     @OneToOne
     private Student student;
 
@@ -49,12 +49,12 @@ public class Avatar {
         this.mediaType = mediaType;
     }
 
-    public byte[] getData() {
-        return data;
+    public byte[] getPreview() {
+        return preview;
     }
 
-    public void setData(byte[] data) {
-        this.data = data;
+    public void setPreview(byte[] data) {
+        this.preview = data;
     }
 
     public Student getStudent() {

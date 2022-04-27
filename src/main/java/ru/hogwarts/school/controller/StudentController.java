@@ -1,16 +1,23 @@
 package ru.hogwarts.school.controller;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import ru.hogwarts.school.model.Avatar;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.AvatarService;
 import ru.hogwarts.school.service.StudentService;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 
 @RequestMapping("student")
@@ -28,7 +35,7 @@ public class StudentController {
 
     @PostMapping()
     public ResponseEntity<Student> crateStudent(@RequestBody Student student) {
-        if (student.getId() != 0){
+        if (student.getId() != 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id must be zero.");
         }
         Student createdStudent = studentService.crateStudent(student);
@@ -38,16 +45,16 @@ public class StudentController {
     @GetMapping("{id}")
     public Student findStudent(@PathVariable long id) {
         Student foundStudent = studentService.findStudent(id);
-        if (foundStudent == null){
+        if (foundStudent == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student must be created.");
         }
-            return studentService.findStudent(id);
+        return studentService.findStudent(id);
     }
 
     @PutMapping()
     public Student updateStudent(@RequestBody Student student) {
         Student foundStudent = studentService.findStudent(student.getId());
-        if (foundStudent == null){
+        if (foundStudent == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student must be created.");
         }
         return studentService.updateStudent(student);
@@ -79,8 +86,54 @@ public class StudentController {
     }
 
     @PostMapping(value = "{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String uploadAvatar(@PathVariable long id, @RequestParam MultipartFile avatar){
-        return avatarService.uploadAvatar(id, avatar);
+    public ResponseEntity<String> uploadAvatar(@PathVariable long id, @RequestParam MultipartFile avatar) throws IOException {
+        if (avatar.getSize() > 1024 * 300) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pic is too big");
+        }
+        if (StringUtils.hasLength(avatar.getContentType())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pic name is empty");
+        }
+        avatarService.uploadAvatar(id, avatar);
+        return ResponseEntity.ok().build();
     }
+
+    @GetMapping(value = "{id}/avatar")
+    public void getAvatar(@PathVariable long id, HttpServletResponse response) throws IOException {
+        Avatar avatar = avatarService.findAvatar(id);
+        Path avatarPath = Path.of(avatar.getFilePath());
+
+        try (InputStream is = Files.newInputStream(avatarPath);
+             OutputStream os = response.getOutputStream()) {
+            response.setStatus(200);
+            response.setContentType(avatar.getMediaType());
+            response.setContentLengthLong(avatar.getFileSize());
+            is.transferTo(os);
+        }
+    }
+
+    @GetMapping(value = "{id}/avatar/preview")
+    public ResponseEntity<byte[]> getAvatarPreview(@PathVariable long id) {
+        Avatar avatar = avatarService.findAvatar(id);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.parseMediaType(avatar.getMediaType()));
+        httpHeaders.setContentLength(avatar.getPreview().length);
+        return ResponseEntity.ok().headers(httpHeaders).body(avatar.getPreview());
+    }
+
+//    @GetMapping(value = "{id}/avatar/preview")
+//    public void getAvatarPreview(@PathVariable long id, HttpServletResponse response) throws IOException {
+//        Avatar avatar = avatarService.findAvatar(id);
+//
+//        response.setContentLength( );
+//        response.setContentType(avatar.getMediaType());
+//
+//        try (
+//                InputStream is = new ByteArrayInputStream(avatar.getPreview());
+//                OutputStream os = response.getOutputStream()
+//                ){
+//            is.transferTo(os);
+//        }
+//
+//    }
 
 }
