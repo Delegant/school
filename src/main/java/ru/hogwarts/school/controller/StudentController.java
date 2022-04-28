@@ -90,25 +90,13 @@ public class StudentController {
         if (avatar.getSize() > 1024 * 300) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pic is too big");
         }
-        if (StringUtils.hasLength(avatar.getContentType())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pic name is empty");
-        }
         avatarService.uploadAvatar(id, avatar);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping(value = "{id}/avatar")
     public void getAvatar(@PathVariable long id, HttpServletResponse response) throws IOException {
-        Avatar avatar = avatarService.findAvatar(id);
-        Path avatarPath = Path.of(avatar.getFilePath());
-
-        try (InputStream is = Files.newInputStream(avatarPath);
-             OutputStream os = response.getOutputStream()) {
-            response.setStatus(200);
-            response.setContentType(avatar.getMediaType());
-            response.setContentLengthLong(avatar.getFileSize());
-            is.transferTo(os);
-        }
+        avatarService.getAvatar(id, response);
     }
 
     @GetMapping(value = "{id}/avatar/preview")
@@ -119,21 +107,4 @@ public class StudentController {
         httpHeaders.setContentLength(avatar.getPreview().length);
         return ResponseEntity.ok().headers(httpHeaders).body(avatar.getPreview());
     }
-
-//    @GetMapping(value = "{id}/avatar/preview")
-//    public void getAvatarPreview(@PathVariable long id, HttpServletResponse response) throws IOException {
-//        Avatar avatar = avatarService.findAvatar(id);
-//
-//        response.setContentLength( );
-//        response.setContentType(avatar.getMediaType());
-//
-//        try (
-//                InputStream is = new ByteArrayInputStream(avatar.getPreview());
-//                OutputStream os = response.getOutputStream()
-//                ){
-//            is.transferTo(os);
-//        }
-//
-//    }
-
 }
