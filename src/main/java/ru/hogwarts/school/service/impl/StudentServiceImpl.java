@@ -34,6 +34,11 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    public boolean findStudent(String name) {
+        return studentRepository.findByName(name).size() > 0;
+    }
+
+    @Override
     public Student updateStudent(Student student) {
         return studentRepository.save(student);
     }
@@ -54,8 +59,8 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Faculty getFacultyByStudentId(String name){
-        return facultyRepository.getFacultyByStudentId(name);
+    public Collection<Student> getStudentsByFacultyId(long id) {
+        return studentRepository.getStudentsByFacultyId(id);
     }
 
 }

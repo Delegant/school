@@ -4,7 +4,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -12,12 +11,11 @@ import ru.hogwarts.school.model.Avatar;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.AvatarService;
+import ru.hogwarts.school.service.FacultyService;
 import ru.hogwarts.school.service.StudentService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 
 @RequestMapping("student")
@@ -26,11 +24,13 @@ public class StudentController {
 
     private final StudentService studentService;
     private final AvatarService avatarService;
+    private final FacultyService facultyService;
 
 
-    public StudentController(StudentService studentService, AvatarService avatarService) {
+    public StudentController(StudentService studentService, AvatarService avatarService, FacultyService facultyService) {
         this.studentService = studentService;
         this.avatarService = avatarService;
+        this.facultyService = facultyService;
     }
 
     @PostMapping()
@@ -51,6 +51,21 @@ public class StudentController {
         return studentService.findStudent(id);
     }
 
+    @PutMapping("faculty/")
+    public Student setStudentFaculty(@RequestParam(name = "student_id") long student_id,
+                                     @RequestParam(name = "faculty_id") long faculty_id) {
+        Faculty foundFaculty = facultyService.findFaculty(faculty_id);
+        if (foundFaculty == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Faculty doesn't exist.");
+        }
+        Student foundStudent = studentService.findStudent(student_id);
+        if (foundStudent == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student must be created.");
+        }
+        foundStudent.setFaculty(foundFaculty);
+        return studentService.updateStudent(foundStudent);
+    }
+
     @PutMapping()
     public Student updateStudent(@RequestBody Student student) {
         Student foundStudent = studentService.findStudent(student.getId());
@@ -61,10 +76,13 @@ public class StudentController {
     }
 
     @DeleteMapping("{id}")
-    public Student deleteStudent(@PathVariable long id) {
+    public Student deleteStudent(@PathVariable long id) throws IOException {
         Student foundStudent = studentService.findStudent(id);
         if (foundStudent == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student must be created.");
+        }
+        if (avatarService.findAvatar(id).getFilePath() != null) {
+            avatarService.deleteAvatarFile(id);
         }
         studentService.deleteStudent(id);
         return foundStudent;
@@ -81,14 +99,17 @@ public class StudentController {
     }
 
     @GetMapping("faculty/{name}")
-    public Faculty getFacultyByStudentId(@PathVariable String name) {
-        return studentService.getFacultyByStudentId(name);
+    public Collection<Faculty> getFacultyByStudentName(@PathVariable String name) {
+        if (!studentService.findStudent(name)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student must be created.");
+        }
+        return facultyService.getFacultyByStudentName(name);
     }
 
     @PostMapping(value = "{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadAvatar(@PathVariable long id, @RequestParam MultipartFile avatar) throws IOException {
-        if (avatar.getSize() > 1024 * 300) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pic is too big");
+    public ResponseEntity<String> uploadAvatar(@PathVariable long id, @RequestParam("avatar") MultipartFile avatar) throws IOException {
+        if (avatar.getSize() > 1024 * 300 || avatar.getSize() == 0L) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pic not correct");
         }
         avatarService.uploadAvatar(id, avatar);
         return ResponseEntity.ok().build();

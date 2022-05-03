@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
@@ -95,6 +96,13 @@ public class AvatarServiceImpl implements AvatarService {
             response.setContentLengthLong(avatar.getFileSize());
             is.transferTo(os);
         }
+    }
+
+    @Override
+    public void deleteAvatarFile(long id) throws IOException {
+        Avatar avatar = avatarRepository.findByStudentId(id).get();
+        Path avatarFilePath = Path.of(avatar.getFilePath());
+        Files.deleteIfExists(avatarFilePath);
     }
 
     private String getExtension(String nameFile) {

@@ -12,4 +12,6 @@ public interface AvatarService {
     Avatar findAvatar(long studentId);
 
     void getAvatar(long id, HttpServletResponse response)throws IOException;
+
+    void deleteAvatarFile(long id) throws IOException;
 }
