@@ -44,10 +44,7 @@ public class StudentController {
 
     @GetMapping("{id}")
     public Student findStudent(@PathVariable long id) {
-        Student foundStudent = studentService.findStudent(id);
-        if (foundStudent == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student must be created.");
-        }
+        studentService.findStudent(id);
         return studentService.findStudent(id);
     }
 
@@ -55,32 +52,20 @@ public class StudentController {
     public Student setStudentFaculty(@RequestParam(name = "student_id") long student_id,
                                      @RequestParam(name = "faculty_id") long faculty_id) {
         Faculty foundFaculty = facultyService.findFaculty(faculty_id);
-        if (foundFaculty == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Faculty doesn't exist.");
-        }
         Student foundStudent = studentService.findStudent(student_id);
-        if (foundStudent == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student must be created.");
-        }
         foundStudent.setFaculty(foundFaculty);
         return studentService.updateStudent(foundStudent);
     }
 
     @PutMapping()
     public Student updateStudent(@RequestBody Student student) {
-        Student foundStudent = studentService.findStudent(student.getId());
-        if (foundStudent == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student must be created.");
-        }
+        studentService.findStudent(student.getId());
         return studentService.updateStudent(student);
     }
 
     @DeleteMapping("{id}")
     public Student deleteStudent(@PathVariable long id) throws IOException {
         Student foundStudent = studentService.findStudent(id);
-        if (foundStudent == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student must be created.");
-        }
         if (avatarService.findAvatar(id).getFilePath() != null) {
             avatarService.deleteAvatarFile(id);
         }
@@ -108,6 +93,7 @@ public class StudentController {
 
     @PostMapping(value = "{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadAvatar(@PathVariable long id, @RequestParam("avatar") MultipartFile avatar) throws IOException {
+        studentService.findStudent(id);
         if (avatar.getSize() > 1024 * 300 || avatar.getSize() == 0L) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pic not correct");
         }

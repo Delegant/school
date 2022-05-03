@@ -10,8 +10,11 @@ import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.FacultyService;
 import ru.hogwarts.school.service.StudentService;
 
+import javax.transaction.Transactional;
 import java.util.Collection;
+import java.util.Optional;
 
+@Transactional
 @Service
 public class StudentServiceImpl implements StudentService {
 
@@ -30,7 +33,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student findStudent(long id) {
-        return studentRepository.findById(id).orElse(null);
+        return studentRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student must be created."));
     }
 
     @Override
@@ -54,7 +57,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public  Collection<Student> findByAgeBetween (int min, int max) {
+    public Collection<Student> findByAgeBetween(int min, int max) {
         return studentRepository.findByAgeBetween(min, max);
     }
 

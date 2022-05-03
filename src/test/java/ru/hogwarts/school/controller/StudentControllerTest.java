@@ -1,4 +1,4 @@
-package ru.hogwarts.school;
+package ru.hogwarts.school.controller;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
@@ -27,7 +27,7 @@ import static ru.hogwarts.school.constants.SchoolApplicationTestsConstants.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class SchoolApplicationTests {
+class StudentControllerTest {
 
     @LocalServerPort
     int port;
@@ -42,13 +42,17 @@ class SchoolApplicationTests {
 
     @BeforeAll
     void addNewTestStudentAndAvatarPic() throws IOException {
-        shouldReturnNotZeroStudentIdAfterPost();
+        String url = LOCALHOST + port + STUDENT_ENDPOINT;
+        Student student = new Student(ZERO_ID, STUDENT_TEST_NAME, STUDENT_TEST_AGE);
+        studentResponse = restTemplate.postForObject(url, student, Student.class);
+        studentId = studentResponse.getId();
         shouldReturnStatus200WhenPostTestAvatarPic();
     }
 
     @AfterAll
     void deleteTestStudentAndAvatar() {
-        shouldReturnZeroStudentIdAfterDeleteStudent();
+        String url = LOCALHOST + port + STUDENT_ENDPOINT + "/" + studentId;
+        restTemplate.delete(url, Student.class);
     }
 
     @Test
@@ -56,15 +60,17 @@ class SchoolApplicationTests {
         Assertions.assertThat(studentController).isNotNull();
     }
 
+    @Test
     void shouldReturnNotZeroStudentIdAfterPost() {
         String url = LOCALHOST + port + STUDENT_ENDPOINT;
         Student student = new Student(ZERO_ID, STUDENT_TEST_NAME, STUDENT_TEST_AGE);
-        studentResponse = restTemplate.postForObject(url, student, Student.class);
-        studentId = studentResponse.getId();
+        Student responseStudent = restTemplate.postForObject(url, student, Student.class);
         Assertions.assertThat(studentId).isNotZero();
+        restTemplate.delete(url + "/" + responseStudent.getId(), Student.class);
     }
 
-    public void shouldReturnStatus200WhenPostTestAvatarPic() throws IOException {
+    @Test
+    void shouldReturnStatus200WhenPostTestAvatarPic() throws IOException {
         String urlPutAvatar = LOCALHOST + port + STUDENT_ENDPOINT + "/" + studentId + AVATAR_ENDPOINT;
         Path testPicPath = Files.createTempFile("testAvatarFile", ".png");
         BufferedImage image = new BufferedImage(1024, 300, BufferedImage.TYPE_INT_ARGB);
@@ -84,11 +90,15 @@ class SchoolApplicationTests {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
+    @Test
     void shouldReturnZeroStudentIdAfterDeleteStudent() {
-        String url = LOCALHOST + port + STUDENT_ENDPOINT + "/" + studentId;
-        restTemplate.delete(url, Student.class);
+        String urlPost = LOCALHOST + port + STUDENT_ENDPOINT;
+        Student student = new Student(ZERO_ID, STUDENT_TEST_NAME, STUDENT_TEST_AGE);
+        Student studentResponse = restTemplate.postForObject(urlPost, student, Student.class);
+        String urlGetAndDelete = LOCALHOST + port + STUDENT_ENDPOINT + "/" + studentResponse.getId();
+        restTemplate.delete(urlGetAndDelete, Student.class);
         Assertions
-                .assertThat(restTemplate.getForObject(url, Student.class))
+                .assertThat(restTemplate.getForObject(urlGetAndDelete, Student.class))
                 .hasFieldOrPropertyWithValue(ENTITY_FILED_ID, 0L);
     }
 
@@ -110,7 +120,6 @@ class SchoolApplicationTests {
         Assertions
                 .assertThat(restTemplate.getForObject(urlGet, Student.class))
                 .hasFieldOrPropertyWithValue(ENTITY_FILED_NAME, STUDENT_TEST_NAME2);
-        restTemplate.delete(urlGet);
     }
 
     @Test
@@ -147,12 +156,12 @@ class SchoolApplicationTests {
     @Test
     void shouldReturnNotNullAvatarPicWhenGetIt() {
         String urlPutAvatar = LOCALHOST + port + STUDENT_ENDPOINT + "/" + studentId + AVATAR_ENDPOINT;
-        assertThat(restTemplate.getForObject(urlPutAvatar, HttpServletResponse.class)).isNotNull();
+        assertThat(restTemplate.getForObject(urlPutAvatar, String.class)).isNotNull();
     }
 
     @Test
     void shouldReturnNotNullAvatarPreviewPicWhenGetIt() {
         String urlPutAvatar = LOCALHOST + port + STUDENT_ENDPOINT + "/" + studentId + AVATAR_PREVIEW_ENDPOINT;
-        assertThat(restTemplate.getForObject(urlPutAvatar, HttpServletResponse.class)).isNotNull();
+        assertThat(restTemplate.getForObject(urlPutAvatar, String.class)).isNotNull();
     }
 }
