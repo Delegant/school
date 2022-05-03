@@ -16,5 +16,5 @@ public interface FacultyService {
 
     Collection<Faculty> filterNameFacultyCollection(String name);
 
-    Collection<Student> getStudentsByFacultyId(long id);
+    Collection<Faculty> getFacultyByStudentName(String name);
 }

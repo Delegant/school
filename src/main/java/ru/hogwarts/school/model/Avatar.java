@@ -8,7 +8,7 @@ import java.util.Objects;
 public class Avatar {
 
     @Id
-    @GeneratedValue
+    @Column(name = "student_id")
     private long id;
 
     private String filePath;
@@ -18,6 +18,8 @@ public class Avatar {
     @Lob
     private byte[] preview;
     @OneToOne
+    @MapsId
+    @JoinColumn(name = "student_id")
     private Student student;
     public long getId() {
         return id;

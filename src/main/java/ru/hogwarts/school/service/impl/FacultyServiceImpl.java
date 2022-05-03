@@ -1,12 +1,11 @@
 package ru.hogwarts.school.service.impl;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
-import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.FacultyService;
-import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
 
@@ -14,11 +13,9 @@ import java.util.Collection;
 public class FacultyServiceImpl implements FacultyService {
 
     private final FacultyRepository facultyRepository;
-    private final StudentRepository studentRepository;
 
-    public FacultyServiceImpl(FacultyRepository facultyRepository, StudentRepository studentRepository) {
+    public FacultyServiceImpl(FacultyRepository facultyRepository) {
         this.facultyRepository = facultyRepository;
-        this.studentRepository = studentRepository;
     }
 
 
@@ -29,7 +26,7 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public Faculty findFaculty(long id) {
-        return facultyRepository.findById(id).orElse(null);
+        return facultyRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Faculty must be created."));
     }
 
     @Override
@@ -48,7 +45,7 @@ public class FacultyServiceImpl implements FacultyService {
     }
 
     @Override
-    public Collection<Student> getStudentsByFacultyId(long id) {
-        return studentRepository.getStudentsByFacultyId(id);
+    public Collection<Faculty> getFacultyByStudentName(String name) {
+        return facultyRepository.getFacultyByStudentId(name);
     }
 }

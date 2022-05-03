@@ -7,6 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
+import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
 
@@ -15,9 +16,11 @@ import java.util.Collection;
 public class FacultyController {
 
     private final FacultyService facultyService;
+    private final StudentService studentService;
 
-    public FacultyController(FacultyService facultyService) {
+    public FacultyController(FacultyService facultyService, StudentService studentService) {
         this.facultyService = facultyService;
+        this.studentService = studentService;
     }
 
     @PostMapping()
@@ -64,7 +67,7 @@ public class FacultyController {
 
     @GetMapping("students/{id}")
     public Collection<Student> getStudentsByFacultyId(@PathVariable long id) {
-        return facultyService.getStudentsByFacultyId(id);
+        return studentService.getStudentsByFacultyId(id);
     }
 
 }
