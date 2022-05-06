@@ -9,11 +9,9 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
-import ru.hogwarts.school.controller.StudentController;
 import ru.hogwarts.school.model.Student;
 
 import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -99,7 +97,7 @@ class StudentControllerTest {
         restTemplate.delete(urlGetAndDelete, Student.class);
         Assertions
                 .assertThat(restTemplate.getForObject(urlGetAndDelete, Student.class))
-                .hasFieldOrPropertyWithValue(ENTITY_FILED_ID, 0L);
+                .hasFieldOrPropertyWithValue(ENTITY_FIELD_ID, 0L);
     }
 
     @Test
@@ -107,7 +105,7 @@ class StudentControllerTest {
         String url = LOCALHOST + port + STUDENT_ENDPOINT + "/" + studentId;
         Assertions
                 .assertThat(restTemplate.getForObject(url, Student.class))
-                .hasFieldOrPropertyWithValue(ENTITY_FILED_NAME, STUDENT_TEST_NAME);
+                .hasFieldOrPropertyWithValue(ENTITY_FIELD_NAME, STUDENT_TEST_NAME);
     }
 
     @Test
@@ -119,7 +117,7 @@ class StudentControllerTest {
 
         Assertions
                 .assertThat(restTemplate.getForObject(urlGet, Student.class))
-                .hasFieldOrPropertyWithValue(ENTITY_FILED_NAME, STUDENT_TEST_NAME2);
+                .hasFieldOrPropertyWithValue(ENTITY_FIELD_NAME, STUDENT_TEST_NAME2);
     }
 
     @Test
@@ -128,7 +126,7 @@ class StudentControllerTest {
         Collection<LinkedHashMap<String, String>> response = restTemplate.getForObject(url, Collection.class);
         Assertions
                 .assertThat(response)
-                .extracting(x -> x.get(ENTITY_FILED_NAME))
+                .extracting(x -> x.get(ENTITY_FIELD_NAME))
                 .contains(STUDENT_TEST_NAME);
     }
 
@@ -138,7 +136,7 @@ class StudentControllerTest {
         Collection<LinkedHashMap<String, String>> response = restTemplate.getForObject(url, Collection.class);
         Assertions
                 .assertThat(response)
-                .extracting(x -> x.get(ENTITY_FILED_NAME))
+                .extracting(x -> x.get(ENTITY_FIELD_NAME))
                 .contains(STUDENT_TEST_NAME);
     }
 
@@ -149,7 +147,7 @@ class StudentControllerTest {
         restTemplate.put(urlPutFaculty, null);
         Collection<LinkedHashMap<String, Integer>> response = restTemplate.getForObject(urlGetStudent, Collection.class);
         assertThat(response)
-                .extracting(x -> x.get(ENTITY_FILED_ID))
+                .extracting(x -> x.get(ENTITY_FIELD_ID))
                 .contains(ONE_ID);
     }
 
