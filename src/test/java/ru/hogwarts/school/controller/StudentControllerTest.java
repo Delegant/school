@@ -60,7 +60,6 @@ class StudentControllerTest {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         HttpEntity<LinkedMultiValueMap<String, Object>> entity = new HttpEntity<LinkedMultiValueMap<String, Object>>(body, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(urlPutAvatar, entity, String.class);
-        response.getStatusCode();
     }
 
     @AfterAll
