@@ -44,31 +44,6 @@ class StudentControllerTest {
         Student student = new Student(ZERO_ID, STUDENT_TEST_NAME, STUDENT_TEST_AGE);
         studentResponse = restTemplate.postForObject(url, student, Student.class);
         studentId = studentResponse.getId();
-        shouldReturnStatus200WhenPostTestAvatarPic();
-    }
-
-    @AfterAll
-    void deleteTestStudentAndAvatar() {
-        String url = LOCALHOST + port + STUDENT_ENDPOINT + "/" + studentId;
-        restTemplate.delete(url, Student.class);
-    }
-
-    @Test
-    void shouldReturnNotNullRequestAfterStartApp() {
-        Assertions.assertThat(studentController).isNotNull();
-    }
-
-    @Test
-    void shouldReturnNotZeroStudentIdAfterPost() {
-        String url = LOCALHOST + port + STUDENT_ENDPOINT;
-        Student student = new Student(ZERO_ID, STUDENT_TEST_NAME, STUDENT_TEST_AGE);
-        Student responseStudent = restTemplate.postForObject(url, student, Student.class);
-        Assertions.assertThat(studentId).isNotZero();
-        restTemplate.delete(url + "/" + responseStudent.getId(), Student.class);
-    }
-
-    @Test
-    void shouldReturnStatus200WhenPostTestAvatarPic() throws IOException {
         String urlPutAvatar = LOCALHOST + port + STUDENT_ENDPOINT + "/" + studentId + AVATAR_ENDPOINT;
         Path testPicPath = Files.createTempFile("testAvatarFile", ".png");
         BufferedImage image = new BufferedImage(1024, 300, BufferedImage.TYPE_INT_ARGB);
@@ -85,7 +60,18 @@ class StudentControllerTest {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         HttpEntity<LinkedMultiValueMap<String, Object>> entity = new HttpEntity<LinkedMultiValueMap<String, Object>>(body, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(urlPutAvatar, entity, String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        response.getStatusCode();
+    }
+
+    @AfterAll
+    void deleteTestStudentAndAvatar() {
+        String url = LOCALHOST + port + STUDENT_ENDPOINT + "/" + studentId;
+        restTemplate.delete(url, Student.class);
+    }
+
+    @Test
+    void shouldReturnNotNullRequestAfterStartApp() {
+        Assertions.assertThat(studentController).isNotNull();
     }
 
     @Test
