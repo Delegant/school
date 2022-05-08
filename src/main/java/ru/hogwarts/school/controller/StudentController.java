@@ -114,4 +114,19 @@ public class StudentController {
         httpHeaders.setContentLength(avatar.getPreview().length);
         return ResponseEntity.ok().headers(httpHeaders).body(avatar.getPreview());
     }
+
+    @GetMapping("/count_students")
+    public int getCountStudents(){
+        return studentService.getCountStudents();
+    }
+
+    @GetMapping("/average_age_students")
+    public float getAverageAgeStudents() {
+        return studentService.getAverageAgeStudents();
+    }
+
+    @GetMapping("/5_last students")
+    public Collection<Student> get5LastStudents() {
+        return studentService.get5LastStudents();
+    }
 }
