@@ -3,15 +3,15 @@ package ru.hogwarts.school.service.impl;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
-import ru.hogwarts.school.service.FacultyService;
 import ru.hogwarts.school.service.StudentService;
 
+import javax.transaction.Transactional;
 import java.util.Collection;
 
+@Transactional
 @Service
 public class StudentServiceImpl implements StudentService {
 
@@ -30,7 +30,12 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student findStudent(long id) {
-        return studentRepository.findById(id).orElse(null);
+        return studentRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student must be created."));
+    }
+
+    @Override
+    public boolean findStudent(String name) {
+        return studentRepository.findByName(name).size() > 0;
     }
 
     @Override
@@ -49,13 +54,13 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public  Collection<Student> findByAgeBetween (int min, int max) {
+    public Collection<Student> findByAgeBetween(int min, int max) {
         return studentRepository.findByAgeBetween(min, max);
     }
 
     @Override
-    public Faculty getFacultyByStudentId(String name){
-        return facultyRepository.getFacultyByStudentId(name);
+    public Collection<Student> getStudentsByFacultyId(long id) {
+        return studentRepository.getStudentsByFacultyId(id);
     }
 
 }

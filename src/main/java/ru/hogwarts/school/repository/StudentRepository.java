@@ -8,6 +8,7 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface StudentRepository extends JpaRepository<Student, Long> {
 
@@ -19,5 +20,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 //            nativeQuery = true)
     @Query("select s from Student s where s.faculty.id = :id")
     Collection<Student> getStudentsByFacultyId(long id);
+
+    Collection<Student> findByName(String name);
 
 }

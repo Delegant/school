@@ -11,6 +11,6 @@ public interface FacultyRepository extends JpaRepository<Faculty, Long> {
     Collection<Faculty> findByNameIgnoreCase(String name);
 
     @Query("select f from Faculty f, Student s where s.name like :name and f.id = s.faculty.id")
-    Faculty getFacultyByStudentId(String name);
+    Collection<Faculty> getFacultyByStudentId(String name);
 
 }
