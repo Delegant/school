@@ -44,7 +44,6 @@ public class StudentController {
 
     @GetMapping("{id}")
     public Student findStudent(@PathVariable long id) {
-        studentService.findStudent(id);
         return studentService.findStudent(id);
     }
 
