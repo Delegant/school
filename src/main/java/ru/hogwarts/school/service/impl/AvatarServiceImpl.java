@@ -1,8 +1,11 @@
 package ru.hogwarts.school.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import ru.hogwarts.school.model.Avatar;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.AvatarRepository;
@@ -17,7 +20,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
+import java.util.List;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
@@ -100,9 +103,15 @@ public class AvatarServiceImpl implements AvatarService {
 
     @Override
     public void deleteAvatarFile(long id) throws IOException {
-        Avatar avatar = avatarRepository.findByStudentId(id).get();
+        Avatar avatar = avatarRepository.findByStudentId(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student must be created."));
         Path avatarFilePath = Path.of(avatar.getFilePath());
         Files.deleteIfExists(avatarFilePath);
+    }
+
+    @Override
+    public List<Avatar> getPageWithAvatars(Integer pageNumber, Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
+        return avatarRepository.findAll(pageRequest).getContent();
     }
 
     private String getExtension(String nameFile) {
