@@ -86,7 +86,7 @@ class StudentControllerTest {
     }
 
     @Test
-    void shouldReturnTestStudentNameAfterFind() throws Exception {
+    void shouldReturnTestStudentNameAfterFind() {
         String url = LOCALHOST + port + STUDENT_ENDPOINT + "/" + studentId;
         Assertions
                 .assertThat(restTemplate.getForObject(url, Student.class))
@@ -103,6 +103,8 @@ class StudentControllerTest {
         Assertions
                 .assertThat(restTemplate.getForObject(urlGet, Student.class))
                 .hasFieldOrPropertyWithValue(ENTITY_FIELD_NAME, STUDENT_TEST_NAME2);
+
+        restTemplate.put(urlPut, new Student(studentId, STUDENT_TEST_NAME, STUDENT_TEST_AGE));
     }
 
     @Test

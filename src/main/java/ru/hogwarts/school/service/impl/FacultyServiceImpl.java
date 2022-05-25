@@ -18,7 +18,6 @@ public class FacultyServiceImpl implements FacultyService {
         this.facultyRepository = facultyRepository;
     }
 
-
     @Override
     public Faculty crateFaculty(Faculty faculty) {
         return facultyRepository.save(faculty);
