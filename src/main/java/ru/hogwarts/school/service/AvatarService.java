@@ -17,4 +17,6 @@ public interface AvatarService {
     void deleteAvatarFile(long id) throws IOException;
 
     List<Avatar> getPageWithAvatars(Integer pageNumber, Integer pageSize);
+
+    int testInteger();
 }

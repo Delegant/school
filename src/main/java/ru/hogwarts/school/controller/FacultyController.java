@@ -69,4 +69,8 @@ public class FacultyController {
         return studentService.getStudentsByFacultyId(id);
     }
 
+    @GetMapping("largest_name")
+    public String getLargestName() {
+        return facultyService.getLargestName();
+    }
 }

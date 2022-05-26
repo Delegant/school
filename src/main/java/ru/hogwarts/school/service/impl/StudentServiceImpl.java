@@ -12,6 +12,7 @@ import ru.hogwarts.school.service.StudentService;
 
 import javax.transaction.Transactional;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -91,6 +92,24 @@ public class StudentServiceImpl implements StudentService {
     public Collection<Student> get5LastStudents() {
         logger.debug("Was invoked method for get five last students");
         return studentRepository.get5LastStudents();
+    }
+
+    @Override
+    public Collection<Student> startWithAChar() {
+    return studentRepository.findAll()
+                .stream()
+                .parallel()
+                .filter(p->p.getName().startsWith("А"))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public float getAverageAgeStudentsStream() {
+        return (float) studentRepository.findAll()
+                .stream()
+                .parallel()
+                .mapToInt(Student::getAge)
+                .average().orElse(0);
     }
 
 }

@@ -24,4 +24,10 @@ public class AvatarController {
     public List<Avatar> getPageWithAvatars(@RequestParam Integer pageNumber, @RequestParam Integer pageSize){
         return avatarService.getPageWithAvatars(pageNumber, pageSize);
         }
+
+    @GetMapping("/test_integer")
+    public int testInteger(){
+        return avatarService.testInteger();
+    }
+
 }
