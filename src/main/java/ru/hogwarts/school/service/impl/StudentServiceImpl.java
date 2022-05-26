@@ -95,12 +95,15 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Collection<Student> startWithAChar() {
+    public Collection<String> startWithAChar() {
     return studentRepository.findAll()
-                .stream()
-                .parallel()
-                .filter(p->p.getName().startsWith("А"))
-                .collect(Collectors.toList());
+            .stream()
+            .parallel()
+            .map(Student::getName)
+            .map(String::toUpperCase)
+            .filter(s->s.startsWith("А"))
+            .sorted()
+            .collect(Collectors.toList());
     }
 
     @Override

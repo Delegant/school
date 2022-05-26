@@ -130,7 +130,7 @@ public class StudentController {
     }
 
     @GetMapping("/start_with_a_char")
-    public Collection<Student> startWithAChar(){
+    public Collection<String> startWithAChar(){
         return studentService.startWithAChar();
     }
 

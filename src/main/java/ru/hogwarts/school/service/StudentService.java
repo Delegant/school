@@ -27,7 +27,7 @@ public interface StudentService {
 
     Collection<Student> get5LastStudents();
 
-    Collection<Student> startWithAChar();
+    Collection<String> startWithAChar();
 
     float getAverageAgeStudentsStream();
 }
