@@ -8,6 +8,7 @@ import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.Collection;
+import java.util.Comparator;
 
 @Service
 public class FacultyServiceImpl implements FacultyService {
@@ -46,5 +47,15 @@ public class FacultyServiceImpl implements FacultyService {
     @Override
     public Collection<Faculty> getFacultyByStudentName(String name) {
         return facultyRepository.getFacultyByStudentId(name);
+    }
+
+    @Override
+    public String getLargestName() {
+       return facultyRepository.findAll()
+               .stream()
+               .parallel()
+               .map(Faculty::getName)
+               .max(Comparator.comparing(String::length))
+               .orElseThrow();
     }
 }

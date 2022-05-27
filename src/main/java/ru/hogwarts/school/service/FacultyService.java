@@ -17,4 +17,6 @@ public interface FacultyService {
     Collection<Faculty> filterNameFacultyCollection(String name);
 
     Collection<Faculty> getFacultyByStudentName(String name);
+
+    String getLargestName();
 }

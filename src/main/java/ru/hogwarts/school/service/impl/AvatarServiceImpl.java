@@ -21,6 +21,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
@@ -112,6 +113,15 @@ public class AvatarServiceImpl implements AvatarService {
     public List<Avatar> getPageWithAvatars(Integer pageNumber, Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
         return avatarRepository.findAll(pageRequest).getContent();
+    }
+
+    @Override
+    public int testInteger() {
+        return Stream
+                .iterate(1, a -> a + 1)
+                .parallel()
+                .limit(1_000_000)
+                .reduce(0, Integer::sum);
     }
 
     private String getExtension(String nameFile) {

@@ -128,4 +128,15 @@ public class StudentController {
     public Collection<Student> get5LastStudents() {
         return studentService.get5LastStudents();
     }
+
+    @GetMapping("/start_with_a_char")
+    public Collection<String> startWithAChar(){
+        return studentService.startWithAChar();
+    }
+
+    @GetMapping("/average_age_students_stream")
+    public float getAverageAgeStudentsStream() {
+        return studentService.getAverageAgeStudentsStream();
+    }
+
 }
