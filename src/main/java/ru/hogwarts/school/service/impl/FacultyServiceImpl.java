@@ -54,7 +54,8 @@ public class FacultyServiceImpl implements FacultyService {
        return facultyRepository.findAll()
                .stream()
                .parallel()
-               .max(Comparator.comparing(f -> f.getName().length()))
-               .orElseThrow().getName();
+               .map(Faculty::getName)
+               .max(Comparator.comparing(String::length))
+               .orElseThrow();
     }
 }
