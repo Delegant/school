@@ -11,7 +11,7 @@ import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
 
 import javax.transaction.Transactional;
-import java.util.Collection;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -96,14 +96,14 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Collection<String> startWithAChar() {
-    return studentRepository.findAll()
-            .stream()
-            .parallel()
-            .map(Student::getName)
-            .map(String::toUpperCase)
-            .filter(s->s.startsWith("А"))
-            .sorted()
-            .collect(Collectors.toList());
+        return studentRepository.findAll()
+                .stream()
+                .parallel()
+                .map(Student::getName)
+                .map(String::toUpperCase)
+                .filter(s -> s.startsWith("А"))
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -115,4 +115,47 @@ public class StudentServiceImpl implements StudentService {
                 .average().orElse(0);
     }
 
+    @Override
+    public Collection<Student> getAllStudents() {
+        List<Student> studentList = studentRepository.findAll();
+        printTwoStudent(studentList, 0);
+        new Thread(() -> printTwoStudent(studentList, 2)).start();
+        new Thread(() -> printTwoStudent(studentList, 4)).start();
+        return studentList;
+    }
+
+    @Override
+    public Collection<Student> getAllStudentsSyn() {
+        List<Student> studentList = studentRepository.findAll();
+        printTwoStudentSyn(studentList, 0);
+        new Thread(() -> printTwoStudentSyn(studentList, 2)).start();
+        new Thread(() -> printTwoStudentSyn(studentList, 4)).start();
+        return studentList;
+    }
+
+    private void printTwoStudent(List<Student> students, int increment) {
+        try {
+            for (int i = increment; i < increment + 2; i++) {
+                if (students.get(i) != null) {
+                    Thread.sleep(1000);
+                    System.out.println(students.get(i));
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private synchronized void printTwoStudentSyn(List<Student> students, int increment) {
+        try {
+            for (int i = increment; i < increment + 2; i++) {
+                if (students.get(i) != null) {
+                    Thread.sleep(1000);
+                    System.out.println(students.get(i));
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }
