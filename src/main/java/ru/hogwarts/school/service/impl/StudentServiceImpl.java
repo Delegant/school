@@ -136,10 +136,8 @@ public class StudentServiceImpl implements StudentService {
     private void printTwoStudent(List<Student> students, int increment) {
         try {
             for (int i = increment; i < increment + 2; i++) {
-                if (students.get(i) != null) {
                     Thread.sleep(1000);
                     System.out.println(students.get(i));
-                }
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -149,10 +147,8 @@ public class StudentServiceImpl implements StudentService {
     private synchronized void printTwoStudentSyn(List<Student> students, int increment) {
         try {
             for (int i = increment; i < increment + 2; i++) {
-                if (students.get(i) != null) {
-                    Thread.sleep(1000);
-                    System.out.println(students.get(i));
-                }
+                Thread.sleep(1000);
+                System.out.println(students.get(i));
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
