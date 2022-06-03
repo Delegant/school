@@ -139,4 +139,13 @@ public class StudentController {
         return studentService.getAverageAgeStudentsStream();
     }
 
+    @GetMapping("/get_all_students")
+    public Collection<Student> getAllStudents(){
+        return studentService.getAllStudents();
+    }
+
+    @GetMapping("/get_all_students_sort")
+    public Collection<Student> getAllStudentsSort(){
+        return studentService.getAllStudentsSyn();
+    }
 }

@@ -30,4 +30,8 @@ public interface StudentService {
     Collection<String> startWithAChar();
 
     float getAverageAgeStudentsStream();
+
+    Collection<Student> getAllStudents();
+
+    Collection<Student> getAllStudentsSyn();
 }
